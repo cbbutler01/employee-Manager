@@ -7,7 +7,7 @@ const PORT = process.env.PORT || 3001;
 
 const pool = new Pool({
     user: 'postgres',
-    password: 'Bzavion18#',
+    password: '',
     host: 'localhost',
     database: 'company_db'
 });
