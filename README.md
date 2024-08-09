@@ -1,6 +1,8 @@
 # employee-Manager
 A simple way to manage a company's employees using command lines
 
+https://app.screencastify.com/v3/watch/5yI4tfmyfeSYbd1B7nAt
+
 ## Installation
 
 To set up and run this application locally, follow these steps:
