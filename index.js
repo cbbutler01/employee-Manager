@@ -6,7 +6,7 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 
 const pool = new Pool({
-    user: 'cbbutler01',
+    user: 'postgres',
     password: 'Bzavion18#',
     host: 'localhost',
     database: 'company_db'
@@ -73,7 +73,7 @@ const startApp = async () => {
 };
 
 const viewAllDepartments = async () => {
-    const query = 'SELECT * FROM department';
+    const query = 'SELECT * FROM departments';
     const departments = await queryDatabase(query);
     console.table(departments);
     await startApp();
@@ -81,9 +81,9 @@ const viewAllDepartments = async () => {
 
 const viewAllRoles = async () => {
     const query = `
-        SELECT role.id, role.title, role.salary, department.name AS department 
-        FROM role 
-        LEFT JOIN department ON role.department_id = department.id
+        SELECT roles.id, roles.title, roles.salary, departments.name AS department 
+        FROM roles
+        LEFT JOIN departments ON roles.department_id = departments.id
     `;
     const roles = await queryDatabase(query);
     console.table(roles);
@@ -92,10 +92,11 @@ const viewAllRoles = async () => {
 
 const viewAllEmployees = async () => {
     const query = `
-        SELECT employee.id, employee.first_name, employee.last_name, role.title, department.name AS department, role.salary, CONCAT(manager.first_name, ' ', manager.last_name) AS manager
+        SELECT employee.id, employee.first_name, employee.last_name, roles.title, departments.name AS department, roles.salary,
+            CONCAT(manager.first_name, ' ', manager.last_name) AS manager
         FROM employee
-        LEFT JOIN role ON employee.role_id = role.id
-        LEFT JOIN department ON role.department_id = department.id
+        LEFT JOIN roles ON employee.role_id = roles.id
+        LEFT JOIN departments ON roles.department_id = departments.id
         LEFT JOIN employee manager ON manager.id = employee.manager_id
     `;
     const employees = await queryDatabase(query);
@@ -110,14 +111,14 @@ const addDepartment = async () => {
         message: 'What is the name of the new department?'
     });
 
-    const query = 'INSERT INTO department (name) VALUES ($1)';
+    const query = 'INSERT INTO departments (name) VALUES ($1)';
     await queryDatabase(query, [name]);
     console.log(`Added ${name} to departments!`);
     await startApp();
 };
 
 const addRole = async () => {
-    const departments = await queryDatabase('SELECT * FROM department');
+    const departments = await queryDatabase('SELECT * FROM departments');
     const departmentChoices = departments.map(dept => ({
         name: dept.name,
         value: dept.id
@@ -129,14 +130,14 @@ const addRole = async () => {
         { name: 'department_id', type: 'list', message: 'Which department does the new role belong to?', choices: departmentChoices }
     ]);
 
-    const query = 'INSERT INTO role (title, salary, department_id) VALUES ($1, $2, $3)';
+    const query = 'INSERT INTO roles (title, salary, department_id) VALUES ($1, $2, $3)';
     await queryDatabase(query, [title, salary, department_id]);
     console.log(`Added ${title} role!`);
     await startApp();
 };
 
 const addEmployee = async () => {
-    const roles = await queryDatabase('SELECT * FROM role');
+    const roles = await queryDatabase('SELECT * FROM roles');
     const employees = await queryDatabase('SELECT * FROM employee');
 
     const roleChoices = roles.map(role => ({
@@ -165,7 +166,7 @@ const addEmployee = async () => {
 
 const updateEmployeeRole = async () => {
     const employees = await queryDatabase('SELECT * FROM employee');
-    const roles = await queryDatabase('SELECT * FROM role');
+    const roles = await queryDatabase('SELECT * FROM roles');
 
     const employeeChoices = employees.map(emp => ({
         name: `${emp.first_name} ${emp.last_name}`,
@@ -187,4 +188,3 @@ const updateEmployeeRole = async () => {
     console.log('Employee role updated successfully');
     await startApp();
 };
-

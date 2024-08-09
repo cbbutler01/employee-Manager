@@ -1,7 +1,7 @@
 DROP DATABASE IF EXISTS company_db;
 CREATE DATABASE company_db;
 
-\c company;
+\c company_db;
 
 CREATE TABLE departments (
     id SERIAL PRIMARY KEY,
@@ -14,7 +14,8 @@ CREATE TABLE roles (
     salary DECIMAL NOT NULL,
     department_id INTEGER NOT NULL,
     FOREIGN KEY (department_id) 
-    REFERENCES departments(id) ON DELETE SET NULL
+    REFERENCES departments(id)
+    ON DELETE SET NULL
 );
 
 CREATE TABLE employee(
